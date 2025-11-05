@@ -1,4 +1,4 @@
-// --- PASTE YOUR API KEY HERE ---
+// --- PASTE YOUR (FULL!) API KEY HERE ---
 const API_KEY = 'AIzaSyAJszk6T_pxgXTIahpGXfrU8e8-nf9a5y0';
 
 // Get the HTML elements we need to work with
@@ -42,11 +42,11 @@ async function searchVideos(query) {
     }
 }
 
-// --- NEW: Function to load DEFAULT videos on page load ---
-async function loadDefaultVideos() {
-    // We are no longer using the 'popular' chart.
-    // We are just doing a simple, reliable search for "science".
-    const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=science&key=${API_KEY}&type=video&maxResults=12`;
+// --- This is the function to get "Popular EDUCATIONAL" videos ---
+async function loadPopularVideos() {
+    // We use the /videos endpoint and filter the "mostPopular" chart by category ID 27.
+    // We must include a regionCode for this to work.
+    const url = `https://www.googleapis.com/youtube/v3/videos?part=snippet&chart=mostPopular&videoCategoryId=27&regionCode=US&key=${API_KEY}&maxResults=12`;
 
     try {
         const response = await fetch(url);
@@ -57,12 +57,12 @@ async function loadDefaultVideos() {
     } catch (error) {
         // This will print the error on your webpage
         resultsContainer.innerHTML = `
-            <p><strong>Error loading default videos:</strong></p>
+            <p><strong>Error loading popular videos:</strong></p>
             <pre>${error.toString()}</pre>
         `;
     }
 }
-// --- END OF NEW ---
+// --- END OF FUNCTION ---
 
 // This function takes the video data and builds the HTML
 function displayVideos(videos) {
@@ -72,10 +72,9 @@ function displayVideos(videos) {
     }
 
     videos.forEach(video => {
-        // --- THIS IS NOW SIMPLE AND RELIABLE ---
-        // Both search and default load use the same API, so we only need 'video.id.videoId'.
-        const videoId = video.id.videoId;
-        // --- END OF FIX ---
+        // --- IMPORTANT: This handles both Search results and Popular results ---
+        const videoId = video.id.videoId ? video.id.videoId : video.id;
+        // --- END OF IMPORTANT LINE ---
 
         const videoTitle = video.snippet.title;
         const videoThumbnail = video.snippet.thumbnails.high.url;
@@ -99,5 +98,5 @@ function displayVideos(videos) {
     });
 }
 
-// Call the function to load the default videos when the script first runs
-loadDefaultVideos();
+// Call the function to load popular videos when the script first runs
+loadPopularVideos();
