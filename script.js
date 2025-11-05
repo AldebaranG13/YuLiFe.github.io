@@ -17,11 +17,9 @@ let nextPageToken = '';
 let currentChannelId = 'UCaO-aO_m-iN8G0_7-yE-1fQ'; // FIWA Official ID
 
 // ++++++++++++++++++++++++++++++++++++++++++++++++++++++
-// MOVED THIS FUNCTION UP TO FIX THE 'ReferenceError'
-// This function takes the video data and builds the HTML
+// This function builds the HTML for each video
 // ++++++++++++++++++++++++++++++++++++++++++++++++++++++
 function displayVideos(videos) {
-    // This is the "bulletproof" fix for your TypeError crash
     if (!videos || videos.length === 0) {
         if (resultsContainer.innerHTML === '') {
              resultsContainer.innerHTML = '<p>No videos found.</p>';
@@ -50,41 +48,8 @@ function displayVideos(videos) {
     });
 }
 // ++++++++++++++++++++++++++++++++++++++++++++++++++++++
-// END OF MOVED FUNCTION
+// END OF FUNCTION
 // ++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-
-// Event listener for "Press Enter to Search"
-searchInput.addEventListener('keydown', (event) => {
-    if (event.key === 'Enter') {
-        searchButton.click();
-    }
-});
-
-// Add an event listener to the search button
-searchButton.addEventListener('click', () => {
-    const query = searchInput.value;
-    if (query) {
-        nextPageToken = ''; 
-        loadMoreButton.style.display = 'none';
-        searchVideos(query);
-    }
-});
-
-// Add event listener for the load more button
-loadMoreButton.addEventListener('click', () => {
-    loadChannelVideos();
-});
-
-// --- Event listeners for closing the modal ---
-modalCloseButton.addEventListener('click', () => {
-    closeModal();
-});
-modalContainer.addEventListener('click', (event) => {
-    if (event.target === modalContainer) {
-        closeModal();
-    }
-});
 
 // --- Function to open the modal ---
 function openModal(videoId) {
@@ -97,13 +62,13 @@ function openModal(videoId) {
             allowfullscreen>
         </iframe>
     `;
-    modalContainer.style.display = 'flex'; // <-- This shows the pop-up
+    modalContainer.style.display = 'flex'; // This shows the pop-up
 }
 
 // --- Function to close the modal ---
 function closeModal() {
     videoPlayerContainer.innerHTML = '';
-    modalContainer.style.display = 'none'; // <-- This hides the pop-up
+    modalContainer.style.display = 'none'; // This hides the pop-up
 }
 
 // This function calls the YouTube API for SEARCH
@@ -137,3 +102,67 @@ async function loadChannelVideos() {
 
     try {
         const response = await fetch(url);
+        const data = await response.json();
+
+        if (data.items) {
+            nextPageToken = data.nextPageToken; 
+            if (!url.includes(`&pageToken=`)) {
+                 resultsContainer.innerHTML = ''; 
+            }
+            displayVideos(data.items); // Calls the function
+            
+            if (nextPageToken) {
+                loadMoreButton.style.display = 'block';
+            } else {
+                loadMoreButton.style.display = 'none';
+            }
+        } else if (data.error) {
+            throw new Error(data.error.message);
+        } else {
+            if (resultsContainer.innerHTML === '') {
+                 resultsContainer.innerHTML = '<p>Could not load channel videos.</p>';
+            }
+        }
+    } catch (error) {
+        resultsContainer.innerHTML = `<p><strong>Error loading channel videos:</strong> <pre>${error.toString()}</pre></p>`;
+    }
+}
+
+// --- ALL THE EVENT LISTENERS ARE DOWN HERE ---
+// This ensures they run *after* the page is loaded
+// This should fix the silent crash
+
+// Event listener for "Press Enter to Search"
+searchInput.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') {
+        searchButton.click();
+    }
+});
+
+// Add an event listener to the search button
+searchButton.addEventListener('click', () => {
+    const query = searchInput.value;
+    if (query) {
+        nextPageToken = ''; 
+        loadMoreButton.style.display = 'none';
+        searchVideos(query);
+    }
+});
+
+// Add event listener for the load more button
+loadMoreButton.addEventListener('click', () => {
+    loadChannelVideos();
+});
+
+// --- Event listeners for closing the modal ---
+modalCloseButton.addEventListener('click', () => {
+    closeModal();
+});
+modalContainer.addEventListener('click', (event) => {
+    if (event.target === modalContainer) {
+        closeModal();
+    }
+});
+
+// --- Finally, load the first videos ---
+loadChannelVideos();
