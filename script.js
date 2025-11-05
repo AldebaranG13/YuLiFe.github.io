@@ -44,9 +44,10 @@ async function searchVideos(query) {
 
 // --- NEW: Function to get "Popular EDUCATIONAL" videos on page load ---
 async function loadPopularVideos() {
-    // We now use the /search endpoint to find videos in category 27 (Education)
-    // and sort by the viewCount to get the most popular.
-    const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&videoCategoryId=27&type=video&order=viewCount&key=${API_KEY}&maxResults=12`;
+    // --- THIS IS THE CORRECT URL ---
+    // We use the /videos endpoint and filter the "mostPopular" chart by category ID 27.
+    // We must include a regionCode for this to work.
+    const url = `https://www.googleapis.com/youtube/v3/videos?part=snippet&chart=mostPopular&videoCategoryId=27&regionCode=US&key=${API_KEY}&maxResults=12`;
 
     try {
         const response = await fetch(url);
@@ -72,11 +73,11 @@ function displayVideos(videos) {
     }
 
     videos.forEach(video => {
-        // --- NEW: This line is now SIMPLER! ---
-        // Both search and popular videos now use the /search endpoint,
-        // so we only need 'video.id.videoId'.
-        const videoId = video.id.videoId;
-        // --- END OF NEW ---
+        // --- IMPORTANT: THIS LINE IS NOW FIXED (I added it back) ---
+        // This handles both Search results (video.id.videoId)
+        // and Popular results (video.id)
+        const videoId = video.id.videoId ? video.id.videoId : video.id;
+        // --- END OF FIX ---
 
         const videoTitle = video.snippet.title;
         const videoThumbnail = video.snippet.thumbnails.high.url;
