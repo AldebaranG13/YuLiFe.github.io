@@ -1,7 +1,6 @@
 // --- PASTE YOUR API KEY HERE ---
 // This is the "password" you got from Google.
-const API_KEY = 'AIzaSyCjLJjJeV3oNcmxQ2lTfn3-fHWH82W7k2c
-';
+const API_KEY = 'AIzaSyAJszk6T_pxgXTIahpGXfrU8e8-nf9a5y0';
 
 // Get the HTML elements we need to work with
 const searchButton = document.getElementById('search-button');
@@ -30,10 +29,18 @@ async function searchVideos(query) {
         
         // Display the new videos
         displayVideos(data.items);
-    } catch (error) {
-        console.error('Error fetching videos:', error);
-        resultsContainer.innerHTML = '<p>Error loading videos. Check your API key.</p>';
+    } 
+    
+    // --- THIS IS THE NEW ERROR CATCH BLOCK ---
+    // It will print the error on your webpage so you can see it.
+    catch (error) {
+        resultsContainer.innerHTML = `
+            <p><strong>Error:</strong></p>
+            <pre>${error.toString()}</pre>
+            <p><strong>(This is probably a 'RefererNotAllowedMapError'. Check your Google Console restrictions.)</strong></p>
+        `;
     }
+    // --- END OF NEW ERROR CATCH BLOCK ---
 }
 
 // This function takes the video data and builds the HTML
