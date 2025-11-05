@@ -2,7 +2,7 @@
 document.addEventListener('DOMContentLoaded', () => {
 
     // --- PASTE YOUR (FULL!) API KEY HERE ---
-    const API_KEY = 'AIzaSyAJszk6T_pxgXTIahpGXfrU8e8-nf9a5y0';
+    const API_KEY = 'YOUR_API_KEY_HERE';
 
     // Get the HTML elements we need to work with
     const pageContainer = document.getElementById('page-container');
@@ -32,12 +32,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         videos.forEach(video => {
-            let videoId, videoTitle, videoThumbnail;
+            let videoId, videoTitle, videoThumbnail, channelName; // <-- Added channelName
             
             if (video.kind === 'youtube#searchResult') {
                 videoId = video.id.videoId;
                 videoTitle = video.snippet.title;
                 videoThumbnail = video.snippet.thumbnails.high.url;
+                channelName = video.snippet.channelTitle; // <-- THIS IS THE NEW LINE
             } else {
                 return; // Unknown, skip
             }
@@ -45,10 +46,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const videoElement = document.createElement('div');
             videoElement.className = 'video-item';
 
+            // --- THIS HTML IS UPDATED ---
             videoElement.innerHTML = `
                 <img src="${videoThumbnail}" alt="${videoTitle}">
                 <h4>${videoTitle}</h4>
+                <p class="channel-name">${channelName}</p> 
             `;
+            // --- END OF UPDATE ---
             
             videoElement.addEventListener('click', () => {
                 openModal(videoId);
@@ -121,7 +125,7 @@ document.addEventListener('DOMContentLoaded', () => {
         modalContainer.style.display = 'none';
     }
 
-    // --- UPDATED: This function now handles pagination ---
+    // --- This function now handles pagination ---
     async function searchVideos(query) {
         let url = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${query}&key=${API_KEY}&type=video&maxResults=50`;
         
