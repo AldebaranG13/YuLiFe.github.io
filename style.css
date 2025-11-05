@@ -4,19 +4,50 @@ body {
     margin: 0;
 }
 
+/* --- I UPDATED THIS HEADER STYLE --- */
 header {
     background-color: #ffffff;
     padding: 20px;
     border-bottom: 1px solid #ddd;
+    
+    /* This new layout stacks the h1, p, and search bar neatly */
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    flex-direction: column;
+    align-items: center; /* Center everything in the header */
+    gap: 15px; /* Adds space between the items */
 }
 
 header h1 {
     margin: 0;
     color: red;
 }
+
+/* --- I UPDATED THE SEARCH CONTAINER --- */
+.search-container {
+    width: 50%; /* Make search bar take up 50% of the header */
+    display: flex;
+}
+
+/* --- NEW: Make the search input and button better --- */
+#search-input {
+    width: 100%;
+    padding: 8px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px 0 0 4px; /* Round left corners */
+}
+
+#search-button {
+    padding: 8px 12px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-left: none;
+    background-color: #f8f8f8;
+    cursor: pointer;
+    border-radius: 0 4px 4px 0; /* Round right corners */
+}
+/* --- END OF SEARCH BAR STYLE --- */
+
 
 #results-container {
     display: grid;
@@ -44,4 +75,31 @@ header h1 {
     margin: 0;
     font-size: 16px;
     color: #333;
+}
+
+#load-more-button {
+    display: none;
+    margin: 20px auto; /* Centers the button */
+    padding: 12px 24px;
+    font-size: 16px;
+    font-weight: bold;
+    color: white;
+    background-color: #ff0000; /* YouTube Red */
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+#load-more-button:hover {
+    background-color: #cc0000;
+}
+
+/* --- THIS IS THE NEW, CLEAN DISCLAIMER STYLE --- */
+.disclaimer {
+    margin: 0;
+    padding: 0 10%; /* Give it some space on the sides */
+    font-size: 12px;
+    color: #888; /* A light grey color */
+    font-style: italic;
+    text-align: center; /* Center the text */
 }
