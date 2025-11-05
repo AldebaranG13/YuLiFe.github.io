@@ -6,15 +6,12 @@ const searchButton = document.getElementById('search-button');
 const searchInput = document.getElementById('search-input');
 const resultsContainer = document.getElementById('results-container');
 
-// --- NEW: Event listener for "Press Enter to Search" ---
+// Event listener for "Press Enter to Search"
 searchInput.addEventListener('keydown', (event) => {
-    // Check if the key pressed was "Enter"
     if (event.key === 'Enter') {
-        // Trigger the search button's click event
         searchButton.click();
     }
 });
-// --- END OF NEW ---
 
 // Add an event listener to the search button
 searchButton.addEventListener('click', () => {
@@ -45,10 +42,11 @@ async function searchVideos(query) {
     }
 }
 
-// --- NEW: Function to get "Most Popular" videos on page load ---
+// --- NEW: Function to get "Popular EDUCATIONAL" videos on page load ---
 async function loadPopularVideos() {
-    // This is the API URL for most popular videos (using 'US' as a default region)
-    const url = `https://www.googleapis.com/youtube/v3/videos?part=snippet&chart=mostPopular&regionCode=US&key=${API_KEY}&maxResults=12`;
+    // We now use the /search endpoint to find videos in category 27 (Education)
+    // and sort by the viewCount to get the most popular.
+    const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&videoCategoryId=27&type=video&order=viewCount&key=${API_KEY}&maxResults=12`;
 
     try {
         const response = await fetch(url);
@@ -74,10 +72,10 @@ function displayVideos(videos) {
     }
 
     videos.forEach(video => {
-        // --- NEW: This line is upgraded to handle BOTH search results and popular results ---
-        // Search results use "video.id.videoId"
-        // Popular results use "video.id"
-        const videoId = video.id.videoId ? video.id.videoId : video.id;
+        // --- NEW: This line is now SIMPLER! ---
+        // Both search and popular videos now use the /search endpoint,
+        // so we only need 'video.id.videoId'.
+        const videoId = video.id.videoId;
         // --- END OF NEW ---
 
         const videoTitle = video.snippet.title;
@@ -102,6 +100,5 @@ function displayVideos(videos) {
     });
 }
 
-// --- NEW: Call the new function to load popular videos when the script first runs ---
+// Call the function to load popular videos when the script first runs
 loadPopularVideos();
-// --- END OF NEW ---
