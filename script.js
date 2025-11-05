@@ -16,6 +16,44 @@ const videoPlayerContainer = document.getElementById('video-player-container');
 let nextPageToken = '';
 let currentChannelId = 'UCaO-aO_m-iN8G0_7-yE-1fQ'; // FIWA Official ID
 
+// ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// MOVED THIS FUNCTION UP TO FIX THE 'ReferenceError'
+// This function takes the video data and builds the HTML
+// ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+function displayVideos(videos) {
+    // This is the "bulletproof" fix for your TypeError crash
+    if (!videos || videos.length === 0) {
+        if (resultsContainer.innerHTML === '') {
+             resultsContainer.innerHTML = '<p>No videos found.</p>';
+        }
+        return;
+    }
+
+    videos.forEach(video => {
+        const videoId = video.id.videoId;
+        const videoTitle = video.snippet.title;
+        const videoThumbnail = video.snippet.thumbnails.high.url;
+
+        const videoElement = document.createElement('div');
+        videoElement.className = 'video-item';
+
+        videoElement.innerHTML = `
+            <img src="${videoThumbnail}" alt="${videoTitle}">
+            <h4>${videoTitle}</h4>
+        `;
+        
+        videoElement.addEventListener('click', () => {
+            openModal(videoId);
+        });
+
+        resultsContainer.appendChild(videoElement);
+    });
+}
+// ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// END OF MOVED FUNCTION
+// ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
 // Event listener for "Press Enter to Search"
 searchInput.addEventListener('keydown', (event) => {
     if (event.key === 'Enter') {
@@ -77,7 +115,7 @@ async function searchVideos(query) {
         resultsContainer.innerHTML = ''; 
 
         if (data.items) {
-            displayVideos(data.items);
+            displayVideos(data.items); // Calls the function
         } else if (data.error) {
             throw new Error(data.error.message);
         } else {
@@ -99,72 +137,3 @@ async function loadChannelVideos() {
 
     try {
         const response = await fetch(url);
-        const data = await response.json();
-
-        if (data.items) {
-            nextPageToken = data.nextPageToken; 
-            if (!url.includes(`&pageToken=`)) {
-                 resultsContainer.innerHTML = ''; 
-            }
-            displayVideos(data.items); // <-- Calls the function
-            
-            if (nextPageToken) {
-                loadMoreButton.style.display = 'block';
-            } else {
-                loadMoreButton.style.display = 'none';
-            }
-        } else if (data.error) {
-            throw new Error(data.error.message);
-        } else {
-            if (resultsContainer.innerHTML === '') {
-                 resultsContainer.innerHTML = '<p>Could not load channel videos.</p>';
-            }
-        }
-    } catch (error) {
-        resultsContainer.innerHTML = `<p><strong>Error loading channel videos:</strong> <pre>${error.toString()}</pre></p>`;
-    }
-}
-
-
-// ++++++++++++++++++++++++++++++++++++++++++++++++++++++
-// ++++++++++++++++++++++++++++++++++++++++++++++++++++++
-//
-//     THIS IS THE FUNCTION THAT WAS 'NOT DEFINED'
-//     IT IS 100% HERE IN THIS SCRIPT.
-//
-// ++++++++++++++++++++++++++++++++++++++++++++++++++++++
-// ++++++++++++++++++++++++++++++++++++++++++++++++++++++
-function displayVideos(videos) {
-    if (!videos || videos.length === 0) {
-        if (resultsContainer.innerHTML === '') {
-             resultsContainer.innerHTML = '<p>No videos found.</p>';
-        }
-        return;
-    }
-
-    videos.forEach(video => {
-        const videoId = video.id.videoId;
-        const videoTitle = video.snippet.title;
-        const videoThumbnail = video.snippet.thumbnails.high.url;
-
-        const videoElement = document.createElement('div');
-        videoElement.className = 'video-item';
-
-        videoElement.innerHTML = `
-            <img src="${videoThumbnail}" alt="${videoTitle}">
-            <h4>${videoTitle}</h4>
-        `;
-        
-        videoElement.addEventListener('click', () => {
-            openModal(videoId);
-S        });
-
-        resultsContainer.appendChild(videoElement);
-    });
-}
-// ++++++++++++++++++++++++++++++++++++++++++++++++++++++
-// ++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-
-// Call the function to load the *first page* of channel videos when the script first runs
-loadChannelVideos();
