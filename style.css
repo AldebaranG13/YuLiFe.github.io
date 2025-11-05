@@ -12,18 +12,24 @@ body {
     margin: 0;
 }
 
-/* --- NEW LAYOUT STYLES --- */
+/* --- LAYOUT STYLES --- */
 #page-container {
     transition: all 0.3s ease-in-out;
 }
 
-/* 1. THIS IS THE DEFAULT STATE (CENTERED) */
+/* 1. DEFAULT STATE (CENTERED) */
 .centered-layout {
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 80vh; /* Center on the viewport */
+    min-height: 100vh; /* Make it full screen */
     flex-direction: column;
+    
+    /* --- NEW BACKGROUND IMAGE AND OVERLAY --- */
+    background-image: linear-gradient(rgba(27, 54, 93, 0.7), rgba(27, 54, 93, 0.7)), url('https://static.wixstatic.com/media/900868_1eef8fad3b5c45c588e649b5b2143b37~mv2_d_4632_2608_s_4_2.jpg/v1/fill/w_560,h_230,al_c,q_80,usm_0.33_1.00_0.00,enc_avif,quality_auto/900868_1eef8fad3b5c45c588e649b5b2143b37~mv2_d_4632_2608_s_4_2.jpg');
+    background-size: cover;
+    background-position: center;
+    /* --- END OF NEW BACKGROUND --- */
 }
 
 .centered-layout header {
@@ -40,7 +46,7 @@ body {
     display: none; /* Hide results and 'load more' on homepage */
 }
 
-/* 2. THIS IS THE "AFTER SEARCH" STATE */
+/* 2. "AFTER SEARCH" STATE */
 .results-layout {
     display: block; /* Normal page flow */
 }
@@ -58,11 +64,16 @@ body {
 .results-layout main {
     display: block; /* Show results */
 }
-/* --- END OF NEW LAYOUT STYLES --- */
+/* --- END OF LAYOUT STYLES --- */
 
 header h1 {
     margin: 0;
-    color: var(--fiwa-dark-blue); /* Use blue by default */
+    color: var(--fiwa-dark-blue); /* Default color (for a flash) */
+}
+
+/* --- NEW: Make homepage title white --- */
+.centered-layout header h1 {
+    color: white;
 }
 
 .results-layout header h1 {
@@ -105,6 +116,11 @@ header h1 {
     text-align: center;
 }
 
+/* --- NEW: Make homepage disclaimer light --- */
+.centered-layout .disclaimer {
+    color: #ddd;
+}
+
 .results-layout .disclaimer {
     color: #ccc; /* Lighter text on dark header */
 }
@@ -124,7 +140,20 @@ header h1 {
     cursor: pointer;
 }
 .video-item img { width: 100%; height: auto; }
-.video-item h4 { padding: 10px; margin: 0; font-size: 16px; color: #333; }
+
+.video-item h4 {
+    padding: 10px 10px 0; /* No bottom padding */
+    margin: 0;
+    font-size: 16px;
+    color: #333;
+}
+
+.channel-name {
+    padding: 4px 10px 10px; /* Add padding */
+    margin: 0;
+    font-size: 14px;
+    color: #555; /* Dark grey */
+}
 
 #load-more-button {
     display: none; /* Hidden by default */
