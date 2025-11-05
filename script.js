@@ -1,11 +1,20 @@
 // --- PASTE YOUR API KEY HERE ---
-// This is the "password" you got from Google.
 const API_KEY = 'AIzaSyAJszk6T_pxgXTIahpGXfrU8e8-nf9a5y0';
 
 // Get the HTML elements we need to work with
 const searchButton = document.getElementById('search-button');
 const searchInput = document.getElementById('search-input');
 const resultsContainer = document.getElementById('results-container');
+
+// --- NEW: Event listener for "Press Enter to Search" ---
+searchInput.addEventListener('keydown', (event) => {
+    // Check if the key pressed was "Enter"
+    if (event.key === 'Enter') {
+        // Trigger the search button's click event
+        searchButton.click();
+    }
+});
+// --- END OF NEW ---
 
 // Add an event listener to the search button
 searchButton.addEventListener('click', () => {
@@ -15,33 +24,47 @@ searchButton.addEventListener('click', () => {
     }
 });
 
-// This function calls the YouTube API
+// This function calls the YouTube API for SEARCH
 async function searchVideos(query) {
-    // This is the official API URL for searching
     const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${query}&key=${API_KEY}&type=video&maxResults=12`;
 
     try {
         const response = await fetch(url);
         const data = await response.json();
         
-        // Clear old results before showing new ones
-        resultsContainer.innerHTML = '';
-        
-        // Display the new videos
+        resultsContainer.innerHTML = ''; // Clear old results
         displayVideos(data.items);
     } 
-    
-    // --- THIS IS THE NEW ERROR CATCH BLOCK ---
-    // It will print the error on your webpage so you can see it.
     catch (error) {
+        // This will print the error on your webpage
         resultsContainer.innerHTML = `
             <p><strong>Error:</strong></p>
             <pre>${error.toString()}</pre>
             <p><strong>(This is probably a 'RefererNotAllowedMapError'. Check your Google Console restrictions.)</strong></p>
         `;
     }
-    // --- END OF NEW ERROR CATCH BLOCK ---
 }
+
+// --- NEW: Function to get "Most Popular" videos on page load ---
+async function loadPopularVideos() {
+    // This is the API URL for most popular videos (using 'US' as a default region)
+    const url = `https://www.googleapis.com/youtube/v3/videos?part=snippet&chart=mostPopular&regionCode=US&key=${API_KEY}&maxResults=12`;
+
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
+
+        resultsContainer.innerHTML = ''; // Clear loading text
+        displayVideos(data.items);
+    } catch (error) {
+        // This will print the error on your webpage
+        resultsContainer.innerHTML = `
+            <p><strong>Error loading popular videos:</strong></p>
+            <pre>${error.toString()}</pre>
+        `;
+    }
+}
+// --- END OF NEW ---
 
 // This function takes the video data and builds the HTML
 function displayVideos(videos) {
@@ -51,7 +74,12 @@ function displayVideos(videos) {
     }
 
     videos.forEach(video => {
-        const videoId = video.id.videoId;
+        // --- NEW: This line is upgraded to handle BOTH search results and popular results ---
+        // Search results use "video.id.videoId"
+        // Popular results use "video.id"
+        const videoId = video.id.videoId ? video.id.videoId : video.id;
+        // --- END OF NEW ---
+
         const videoTitle = video.snippet.title;
         const videoThumbnail = video.snippet.thumbnails.high.url;
 
@@ -73,3 +101,7 @@ function displayVideos(videos) {
         resultsContainer.appendChild(videoElement);
     });
 }
+
+// --- NEW: Call the new function to load popular videos when the script first runs ---
+loadPopularVideos();
+// --- END OF NEW ---
