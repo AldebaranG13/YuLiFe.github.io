@@ -42,12 +42,11 @@ async function searchVideos(query) {
     }
 }
 
-// --- NEW: Function to get "Popular EDUCATIONAL" videos on page load ---
-async function loadPopularVideos() {
-    // --- THIS IS THE CORRECT URL ---
-    // We use the /videos endpoint and filter the "mostPopular" chart by category ID 27.
-    // We must include a regionCode for this to work.
-    const url = `https://www.googleapis.com/youtube/v3/videos?part=snippet&chart=mostPopular&videoCategoryId=27&regionCode=US&key=${API_KEY}&maxResults=12`;
+// --- NEW: Function to load DEFAULT videos on page load ---
+async function loadDefaultVideos() {
+    // We are no longer using the 'popular' chart.
+    // We are just doing a simple, reliable search for "science".
+    const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=science&key=${API_KEY}&type=video&maxResults=12`;
 
     try {
         const response = await fetch(url);
@@ -58,7 +57,7 @@ async function loadPopularVideos() {
     } catch (error) {
         // This will print the error on your webpage
         resultsContainer.innerHTML = `
-            <p><strong>Error loading popular videos:</strong></p>
+            <p><strong>Error loading default videos:</strong></p>
             <pre>${error.toString()}</pre>
         `;
     }
@@ -73,10 +72,9 @@ function displayVideos(videos) {
     }
 
     videos.forEach(video => {
-        // --- IMPORTANT: THIS LINE IS NOW FIXED (I added it back) ---
-        // This handles both Search results (video.id.videoId)
-        // and Popular results (video.id)
-        const videoId = video.id.videoId ? video.id.videoId : video.id;
+        // --- THIS IS NOW SIMPLE AND RELIABLE ---
+        // Both search and default load use the same API, so we only need 'video.id.videoId'.
+        const videoId = video.id.videoId;
         // --- END OF FIX ---
 
         const videoTitle = video.snippet.title;
@@ -101,5 +99,5 @@ function displayVideos(videos) {
     });
 }
 
-// Call the function to load popular videos when the script first runs
-loadPopularVideos();
+// Call the function to load the default videos when the script first runs
+loadDefaultVideos();
