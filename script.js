@@ -232,6 +232,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // ---
     // NEW: LOAD DEFAULT VIDEOS ON STARTUP
     // ---
-    searchVideos('islamic');
+    searchVideos('manhaj salaf');
 
 }); // <-- This closes the DOMContentLoaded listener
